@@ -1,9 +1,27 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowRight, Zap, Database, Target } from "lucide-react";
+import { ArrowRight, Zap, Database, Target, Play } from "lucide-react";
+import SignupModal from "./SignupModal";
+import AISearchModal from "./AISearchModal";
 import heroImage from "@/assets/hero-bg.jpg";
 
 const HeroSection = () => {
+  const [showSignupModal, setShowSignupModal] = useState(false);
+  const [showAISearchModal, setShowAISearchModal] = useState(false);
+
+  const handleSignupSuccess = () => {
+    // After successful signup, show AI search modal
+    setTimeout(() => {
+      setShowAISearchModal(true);
+    }, 500);
+  };
+
+  const handleCreateCampaign = (campaignData: any) => {
+    // Handle campaign creation - in a real app, this would save to database
+    console.log("Creating campaign with:", campaignData);
+    // Redirect to dashboard or show success message
+  };
   const features = [
     {
       icon: Database,
@@ -57,11 +75,17 @@ const HeroSection = () => {
 
           {/* CTAs */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-            <Button variant="hero" size="lg" className="text-lg px-8 py-4">
+            <Button 
+              variant="hero" 
+              size="lg" 
+              className="text-lg px-8 py-4"
+              onClick={() => setShowSignupModal(true)}
+            >
               Start Free Trial
               <ArrowRight className="w-5 h-5" />
             </Button>
             <Button variant="outline" size="lg" className="text-lg px-8 py-4">
+              <Play className="w-5 h-5" />
               Watch Demo
             </Button>
           </div>
@@ -85,6 +109,19 @@ const HeroSection = () => {
           </div>
         </div>
       </div>
+
+      {/* Modals */}
+      <SignupModal 
+        isOpen={showSignupModal}
+        onClose={() => setShowSignupModal(false)}
+        onSuccess={handleSignupSuccess}
+      />
+      
+      <AISearchModal 
+        isOpen={showAISearchModal}
+        onClose={() => setShowAISearchModal(false)}
+        onCreateCampaign={handleCreateCampaign}
+      />
     </section>
   );
 };
