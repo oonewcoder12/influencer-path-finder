@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -51,6 +51,9 @@ const SignupModal = ({ isOpen, onClose, onSuccess }: SignupModalProps) => {
               FindFlow.ai
             </span>
           </DialogTitle>
+          <DialogDescription className="text-center text-muted-foreground">
+            Create your account to start finding perfect influencers
+          </DialogDescription>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4">

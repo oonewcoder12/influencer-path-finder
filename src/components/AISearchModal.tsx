@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
@@ -138,6 +138,9 @@ const AISearchModal = ({ isOpen, onClose, onCreateCampaign }: AISearchModalProps
             <Sparkles className="w-5 h-5 text-primary" />
             AI-Powered Influencer Discovery
           </DialogTitle>
+          <DialogDescription>
+            Use natural language to describe your perfect influencer campaign
+          </DialogDescription>
         </DialogHeader>
 
         {step === "input" && (
