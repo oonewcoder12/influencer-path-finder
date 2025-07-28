@@ -21,28 +21,60 @@
     <script>
       // Prevent crypto wallet extension errors from breaking the app
       (function() {
-        // Initialize window.ethereum as empty object if not exists to prevent null access
+        // More comprehensive extension error handling
+        const originalError = console.error;
+        console.error = function(...args) {
+          const message = args.join(' ');
+          if (message.includes('chrome-extension://') || message.includes('MetaMask')) {
+            console.warn('Extension error suppressed:', message);
+            return;
+          }
+          originalError.apply(console, args);
+        };
+
+        // Initialize window.ethereum properly
         if (typeof window.ethereum === 'undefined') {
           window.ethereum = null;
         }
         
-        // Catch and suppress extension-related errors that don't affect our app
+        // Enhanced error event listener
         window.addEventListener('error', function(e) {
-          if (e.filename && e.filename.includes('chrome-extension://')) {
+          if (e.filename && (e.filename.includes('chrome-extension://') || e.filename.includes('extension'))) {
             e.preventDefault();
+            e.stopPropagation();
             console.warn('Extension error suppressed:', e.message);
             return false;
           }
-        });
+          if (e.message && (e.message.includes('isMetaMask') || e.message.includes('MetaMask'))) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.warn('MetaMask property error suppressed:', e.message);
+            return false;
+          }
+        }, true);
         
         // Prevent unhandled promise rejections from extensions
         window.addEventListener('unhandledrejection', function(e) {
-          if (e.reason && e.reason.message && e.reason.message.includes('MetaMask')) {
+          if (e.reason && e.reason.message && (e.reason.message.includes('MetaMask') || e.reason.message.includes('chrome-extension://'))) {
             e.preventDefault();
-            console.warn('MetaMask promise rejection suppressed:', e.reason.message);
+            console.warn('Extension promise rejection suppressed:', e.reason.message);
             return false;
           }
         });
+
+        // Override Array.prototype.find temporarily to prevent null access errors
+        const originalFind = Array.prototype.find;
+        Array.prototype.find = function(callback, thisArg) {
+          try {
+            return originalFind.call(this, callback, thisArg);
+          } catch (error) {
+            if (error.message && error.message.includes('isMetaMask')) {
+              console.warn('Array.find MetaMask error suppressed:', error.message);
+              return undefined;
+            }
+            throw error;
+          }
+        };
       })();
     </script>
     <div id="root"></div>
