@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
+import VisualSequenceBuilder from '@/components/VisualSequenceBuilder';
+import CampaignAnalytics from '@/components/CampaignAnalytics';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,8 +9,9 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Edit, Trash2, Eye, Play, Pause, BarChart3, Clock, Mail, ArrowRight, ArrowDown } from 'lucide-react';
+import { Plus, Edit, Trash2, Eye, Play, Pause, BarChart3, Clock, Mail, ArrowRight, ArrowDown, Settings, Target } from 'lucide-react';
 
 interface CampaignStep {
   id: string;
@@ -16,6 +19,7 @@ interface CampaignStep {
   templateName: string;
   delay: number; // days
   delayUnit: 'hours' | 'days';
+  order: number;
 }
 
 interface Campaign {
@@ -46,9 +50,9 @@ const SAMPLE_CAMPAIGNS: Campaign[] = [
     description: 'Reaching out to fashion influencers for our spring collection campaign',
     status: 'active',
     steps: [
-      { id: '1', templateId: '1', templateName: 'Initial Outreach - Fashion', delay: 0, delayUnit: 'days' },
-      { id: '2', templateId: '2', templateName: 'Follow-up Email', delay: 3, delayUnit: 'days' },
-      { id: '3', templateId: '3', templateName: 'Final Follow-up', delay: 7, delayUnit: 'days' }
+      { id: '1', templateId: '1', templateName: 'Initial Outreach - Fashion', delay: 0, delayUnit: 'days', order: 0 },
+      { id: '2', templateId: '2', templateName: 'Follow-up Email', delay: 3, delayUnit: 'days', order: 1 },
+      { id: '3', templateId: '3', templateName: 'Final Follow-up', delay: 7, delayUnit: 'days', order: 2 }
     ],
     totalInfluencers: 150,
     sentEmails: 89,
@@ -63,8 +67,8 @@ const SAMPLE_CAMPAIGNS: Campaign[] = [
     description: 'Multi-step outreach for fitness and wellness influencers',
     status: 'draft',
     steps: [
-      { id: '1', templateId: '1', templateName: 'Initial Outreach - Fitness', delay: 0, delayUnit: 'days' },
-      { id: '2', templateId: '2', templateName: 'Follow-up with Benefits', delay: 5, delayUnit: 'days' }
+      { id: '1', templateId: '1', templateName: 'Initial Outreach - Fitness', delay: 0, delayUnit: 'days', order: 0 },
+      { id: '2', templateId: '2', templateName: 'Follow-up with Benefits', delay: 5, delayUnit: 'days', order: 1 }
     ],
     totalInfluencers: 0,
     sentEmails: 0,
@@ -81,7 +85,8 @@ export default function Campaigns() {
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
-  const [viewMode, setViewMode] = useState<'list' | 'details'>('list');
+  const [viewMode, setViewMode] = useState<'list' | 'analytics'>('list');
+  const [selectedCampaignForAnalytics, setSelectedCampaignForAnalytics] = useState<Campaign | null>(null);
   const [editForm, setEditForm] = useState({
     name: '',
     description: '',
@@ -186,17 +191,10 @@ export default function Campaigns() {
     setIsEditing(true);
   };
 
-  const addStep = () => {
-    const newStep: CampaignStep = {
-      id: Date.now().toString(),
-      templateId: '',
-      templateName: '',
-      delay: editForm.steps.length === 0 ? 0 : 3,
-      delayUnit: 'days'
-    };
+  const handleStepsChange = (newSteps: CampaignStep[]) => {
     setEditForm({
       ...editForm,
-      steps: [...editForm.steps, newStep]
+      steps: newSteps
     });
   };
 
@@ -240,9 +238,9 @@ export default function Campaigns() {
             </p>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => setViewMode(viewMode === 'list' ? 'details' : 'list')}>
+            <Button variant="outline" onClick={() => setViewMode(viewMode === 'list' ? 'analytics' : 'list')}>
               {viewMode === 'list' ? <BarChart3 className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              {viewMode === 'list' ? 'Analytics' : 'List View'}
+              {viewMode === 'list' ? 'Analytics View' : 'List View'}
             </Button>
             <Button onClick={startCreating} className="flex items-center gap-2">
               <Plus className="h-4 w-4" />
@@ -251,9 +249,10 @@ export default function Campaigns() {
           </div>
         </div>
 
-        {/* Campaigns Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-          {campaigns.map((campaign) => (
+        {viewMode === 'list' ? (
+          /* Campaigns Grid */
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            {campaigns.map((campaign) => (
             <Card key={campaign.id} className="hover:shadow-lg transition-shadow">
               <CardHeader>
                 <div className="flex items-start justify-between">
@@ -405,6 +404,17 @@ export default function Campaigns() {
                     <Button
                       variant="outline"
                       size="sm"
+                      onClick={() => {
+                        setSelectedCampaignForAnalytics(campaign);
+                        setViewMode('analytics');
+                      }}
+                    >
+                      <BarChart3 className="h-4 w-4" />
+                    </Button>
+                    
+                    <Button
+                      variant="outline"
+                      size="sm"
                       onClick={() => handleDeleteCampaign(campaign.id)}
                     >
                       <Trash2 className="h-4 w-4" />
@@ -412,9 +422,43 @@ export default function Campaigns() {
                   </div>
                 </div>
               </CardContent>
-            </Card>
-          ))}
-        </div>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          /* Analytics View */
+          <div className="space-y-6">
+            {selectedCampaignForAnalytics ? (
+              <div>
+                <div className="flex items-center gap-4 mb-6">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setViewMode('list')}
+                    className="flex items-center gap-2"
+                  >
+                    <ArrowRight className="h-4 w-4 rotate-180" />
+                    Back to Campaigns
+                  </Button>
+                  <div>
+                    <h2 className="text-2xl font-bold">{selectedCampaignForAnalytics.name}</h2>
+                    <p className="text-muted-foreground">{selectedCampaignForAnalytics.description}</p>
+                  </div>
+                  <div className="flex-1" />
+                  <Badge variant="outline" className="capitalize">
+                    {selectedCampaignForAnalytics.status}
+                  </Badge>
+                </div>
+                <CampaignAnalytics campaign={selectedCampaignForAnalytics} />
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <BarChart3 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-semibold mb-2">Select a Campaign</h3>
+                <p className="text-muted-foreground">Choose a campaign to view detailed analytics</p>
+              </div>
+            )}
+          </div>
+        )}
       </main>
 
       {/* Edit/Create Dialog */}
@@ -452,106 +496,12 @@ export default function Campaigns() {
               </div>
             </div>
 
-            {/* Email Steps */}
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <Label className="text-base font-semibold">Email Sequence</Label>
-                <Button onClick={addStep} size="sm" variant="outline">
-                  <Plus className="h-4 w-4 mr-1" />
-                  Add Step
-                </Button>
-              </div>
-              
-              <div className="space-y-4">
-                {editForm.steps.map((step, index) => (
-                  <Card key={step.id}>
-                    <CardContent className="p-4">
-                      <div className="flex items-start gap-4">
-                        <div className="w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-semibold flex-shrink-0 mt-2">
-                          {index + 1}
-                        </div>
-                        
-                        <div className="flex-1 space-y-3">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                              <Label>Email Template</Label>
-                              <Select
-                                value={step.templateId}
-                                onValueChange={(value) => updateStep(step.id, 'templateId', value)}
-                              >
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select template" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {templates.map((template) => (
-                                    <SelectItem key={template.id} value={template.id}>
-                                      {template.name}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
-                            
-                            {index > 0 && (
-                              <div className="grid grid-cols-2 gap-2">
-                                <div>
-                                  <Label>Delay</Label>
-                                  <Input
-                                    type="number"
-                                    min="0"
-                                    value={step.delay}
-                                    onChange={(e) => updateStep(step.id, 'delay', parseInt(e.target.value) || 0)}
-                                  />
-                                </div>
-                                <div>
-                                  <Label>Unit</Label>
-                                  <Select
-                                    value={step.delayUnit}
-                                    onValueChange={(value) => updateStep(step.id, 'delayUnit', value)}
-                                  >
-                                    <SelectTrigger>
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="hours">Hours</SelectItem>
-                                      <SelectItem value="days">Days</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                          
-                          {index > 0 && (
-                            <div className="text-sm text-muted-foreground flex items-center gap-1">
-                              <Clock className="h-3 w-3" />
-                              This email will be sent {step.delay} {step.delayUnit} after the previous email
-                            </div>
-                          )}
-                        </div>
-                        
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => removeStep(step.id)}
-                          className="text-destructive hover:text-destructive"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-                
-                {editForm.steps.length === 0 && (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Mail className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                    <p>No email steps added yet</p>
-                    <p className="text-sm">Click "Add Step" to create your first email</p>
-                  </div>
-                )}
-              </div>
-            </div>
+            {/* Visual Sequence Builder */}
+            <VisualSequenceBuilder
+              steps={editForm.steps}
+              templates={templates}
+              onStepsChange={handleStepsChange}
+            />
 
             {/* Actions */}
             <div className="flex justify-end gap-2 pt-4 border-t">
