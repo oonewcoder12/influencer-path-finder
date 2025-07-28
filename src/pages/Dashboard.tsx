@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Input } from "@/components/ui/input";
 import { 
   Users, 
   Mail, 
@@ -11,11 +13,33 @@ import {
   TrendingUp, 
   Target,
   Plus,
-  MoreHorizontal
+  MoreHorizontal,
+  Sparkles,
+  Search,
+  MessageSquare,
+  Wand2,
+  ArrowRight,
+  List,
+  History
 } from "lucide-react";
 import Header from "@/components/Header";
+import AISearchModal from "@/components/AISearchModal";
+import ListManagement from "@/components/ListManagement";
 
 const Dashboard = () => {
+  const [isAIModalOpen, setIsAIModalOpen] = useState(false);
+  const [isListModalOpen, setIsListModalOpen] = useState(false);
+  const [aiQuery, setAiQuery] = useState("");
+  const [savedLists, setSavedLists] = useState([
+    { id: 1, name: "Tech Influencers Q4", count: 12, created: "2 days ago" },
+    { id: 2, name: "Fashion Micro-Influencers", count: 8, created: "1 week ago" },
+    { id: 3, name: "Gaming Content Creators", count: 15, created: "2 weeks ago" }
+  ]);
+  const [searchHistory, setSearchHistory] = useState([
+    "Tech influencers with 50K+ followers for SaaS launch",
+    "Fashion micro-influencers in California",
+    "Gaming content creators with high engagement"
+  ]);
   const stats = [
     {
       title: "Total Campaigns",
@@ -122,21 +146,95 @@ const Dashboard = () => {
     }
   };
 
+  const handleAISearch = () => {
+    if (aiQuery.trim()) {
+      setIsAIModalOpen(true);
+    }
+  };
+
+  const handleCreateCampaign = (results: any) => {
+    // Add the new campaign to saved lists
+    const newList = {
+      id: savedLists.length + 1,
+      name: results.campaignName,
+      count: results.influencers.length,
+      created: "Just now"
+    };
+    setSavedLists([newList, ...savedLists]);
+    
+    // Add to search history if not already there
+    if (!searchHistory.includes(aiQuery)) {
+      setSearchHistory([aiQuery, ...searchHistory.slice(0, 4)]);
+    }
+    
+    setAiQuery("");
+  };
+
+  const quickSearchSuggestions = [
+    "Tech influencers for SaaS launch",
+    "Fashion micro-influencers",
+    "Gaming content creators",
+    "Fitness enthusiasts with 10K+ followers"
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-subtle">
       <Header />
       
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Campaign Dashboard</h1>
-            <p className="text-muted-foreground">Manage your influencer outreach campaigns</p>
+        {/* AI-Powered Header */}
+        <div className="text-center mb-8">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center">
+              <Sparkles className="w-6 h-6 text-primary-foreground" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold">AI Influencer Discovery</h1>
+              <p className="text-muted-foreground">Discover perfect influencers using natural language</p>
+            </div>
           </div>
-          <Button variant="hero" className="flex items-center gap-2">
-            <Plus className="w-4 h-4" />
-            New Campaign
-          </Button>
+
+          {/* AI Search Bar */}
+          <div className="max-w-2xl mx-auto mb-6">
+            <div className="relative">
+              <Input
+                placeholder="Describe your perfect influencer campaign... e.g., 'Find tech influencers with 50K+ followers for our SaaS launch'"
+                value={aiQuery}
+                onChange={(e) => setAiQuery(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleAISearch()}
+                className="h-14 pl-12 pr-32 text-base bg-background/60 backdrop-blur-sm border-2"
+              />
+              <Wand2 className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+              <Button 
+                onClick={handleAISearch}
+                disabled={!aiQuery.trim()}
+                variant="hero"
+                size="sm"
+                className="absolute right-2 top-1/2 transform -translate-y-1/2"
+              >
+                <Search className="w-4 h-4 mr-2" />
+                Search
+              </Button>
+            </div>
+
+            {/* Quick Suggestions */}
+            <div className="flex flex-wrap gap-2 mt-4 justify-center">
+              {quickSearchSuggestions.map((suggestion, index) => (
+                <Button
+                  key={index}
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setAiQuery(suggestion);
+                    setTimeout(() => handleAISearch(), 100);
+                  }}
+                  className="text-xs"
+                >
+                  {suggestion}
+                </Button>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Stats Grid */}
@@ -159,10 +257,54 @@ const Dashboard = () => {
           })}
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Saved Influencer Lists */}
+          <div>
+            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+              <List className="w-5 h-5" />
+              My Influencer Lists
+            </h2>
+            <div className="space-y-4">
+              {savedLists.map((list) => (
+                <Card key={list.id} className="p-4 hover:shadow-md transition-shadow">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-semibold">{list.name}</h3>
+                    <Badge variant="secondary">{list.count} influencers</Badge>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-3">Created {list.created}</p>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="flex-1"
+                      onClick={() => setIsListModalOpen(true)}
+                    >
+                      View List
+                    </Button>
+                    <Button variant="outline" size="sm">
+                      Export
+                    </Button>
+                  </div>
+                </Card>
+              ))}
+              
+              <Button 
+                variant="outline" 
+                className="w-full h-20 border-dashed"
+                onClick={() => setIsAIModalOpen(true)}
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Create New List with AI
+              </Button>
+            </div>
+          </div>
+
           {/* Active Campaigns */}
           <div>
-            <h2 className="text-xl font-semibold mb-4">Active Campaigns</h2>
+            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+              <Target className="w-5 h-5" />
+              Active Campaigns
+            </h2>
             <div className="space-y-4">
               {campaigns.map((campaign) => (
                 <Card key={campaign.id} className="p-6">
@@ -213,9 +355,34 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Recent Activity */}
+          {/* Search History & Quick Actions */}
           <div>
-            <h2 className="text-xl font-semibold mb-4">Recent Activity</h2>
+            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+              <History className="w-5 h-5" />
+              Recent Searches
+            </h2>
+            <Card className="p-6 mb-6">
+              <div className="space-y-3">
+                {searchHistory.map((search, index) => (
+                  <div 
+                    key={index} 
+                    className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
+                    onClick={() => {
+                      setAiQuery(search);
+                      handleAISearch();
+                    }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <MessageSquare className="w-4 h-4 text-muted-foreground" />
+                      <p className="text-sm">{search}</p>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-muted-foreground" />
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            <h3 className="text-lg font-semibold mb-4">Recent Activity</h3>
             <Card className="p-6">
               <div className="space-y-4">
                 {recentActivity.map((activity, index) => (
@@ -252,6 +419,17 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+
+      <AISearchModal 
+        isOpen={isAIModalOpen} 
+        onClose={() => setIsAIModalOpen(false)}
+        onCreateCampaign={handleCreateCampaign}
+      />
+      
+      <ListManagement 
+        isOpen={isListModalOpen}
+        onClose={() => setIsListModalOpen(false)}
+      />
     </div>
   );
 };

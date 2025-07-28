@@ -22,10 +22,12 @@ const AISearchModal = ({ isOpen, onClose, onCreateCampaign }: AISearchModalProps
   const { toast } = useToast();
 
   const exampleQueries = [
-    "Find tech influencers with 50K+ followers for our SaaS launch",
-    "I need lifestyle creators in California for our wellness brand",
-    "Looking for gaming influencers aged 18-25 with high engagement",
-    "Find food bloggers who post about healthy recipes"
+    "Find e-commerce influencers with 100K+ followers for product launches",
+    "I need tech reviewers and early adopters for our software beta",
+    "Looking for beauty micro-influencers aged 22-35 with high engagement",
+    "Find lifestyle bloggers who post about sustainable living",
+    "Get me fashion influencers in New York and LA for our brand campaign",
+    "Find gaming streamers with strong community engagement"
   ];
 
   const mockSearchResults = {
@@ -81,10 +83,13 @@ const AISearchModal = ({ isOpen, onClose, onCreateCampaign }: AISearchModalProps
     // Simulate AI processing
     setTimeout(() => {
       // Parse query and generate mock results
-      const campaignName = query.includes("tech") ? "Tech Influencer Outreach" :
-                          query.includes("lifestyle") ? "Lifestyle Creator Campaign" :
-                          query.includes("gaming") ? "Gaming Influencer Partnership" :
-                          query.includes("food") ? "Food Creator Collaboration" :
+      const campaignName = query.toLowerCase().includes("e-commerce") ? "E-commerce Influencer Campaign" :
+                          query.toLowerCase().includes("tech") ? "Tech Influencer Outreach" :
+                          query.toLowerCase().includes("lifestyle") ? "Lifestyle Creator Campaign" :
+                          query.toLowerCase().includes("gaming") ? "Gaming Influencer Partnership" :
+                          query.toLowerCase().includes("food") ? "Food Creator Collaboration" :
+                          query.toLowerCase().includes("beauty") ? "Beauty Influencer Campaign" :
+                          query.toLowerCase().includes("fashion") ? "Fashion Creator Partnership" :
                           "Custom Influencer Campaign";
       
       setSearchResults({ ...mockSearchResults, campaignName });

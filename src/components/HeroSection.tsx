@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowRight, Zap, Database, Target, Play } from "lucide-react";
@@ -7,14 +8,16 @@ import AISearchModal from "./AISearchModal";
 import heroImage from "@/assets/hero-bg.jpg";
 
 const HeroSection = () => {
+  const navigate = useNavigate();
   const [showSignupModal, setShowSignupModal] = useState(false);
   const [showAISearchModal, setShowAISearchModal] = useState(false);
 
   const handleSignupSuccess = () => {
-    // After successful signup, show AI search modal
+    // After successful signup, redirect to dashboard
+    setShowSignupModal(false);
     setTimeout(() => {
-      setShowAISearchModal(true);
-    }, 500);
+      navigate('/dashboard');
+    }, 300);
   };
 
   const handleCreateCampaign = (campaignData: any) => {
