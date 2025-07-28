@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Search, Users, BarChart3, Settings } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 
 const Header = () => {
   const location = useLocation();
@@ -28,16 +28,16 @@ const Header = () => {
               const Icon = item.icon;
               const isActive = location.pathname === item.path;
               return (
-                <a
+                <Link
                   key={item.path}
-                  href={item.path}
+                  to={item.path}
                   className={`flex items-center space-x-2 text-sm font-medium transition-colors hover:text-primary ${
                     isActive ? "text-primary" : "text-muted-foreground"
                   }`}
                 >
                   {Icon && <Icon className="w-4 h-4" />}
                   <span>{item.label}</span>
-                </a>
+                </Link>
               );
             })}
           </nav>
