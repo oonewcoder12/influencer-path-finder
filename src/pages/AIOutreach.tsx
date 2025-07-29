@@ -597,47 +597,6 @@ Example: 'I'm launching a new fitness protein powder targeted at women aged 25-3
     </div>
   );
 
-  const TemplatesTab = () => (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-semibold">Email Templates</h2>
-        <Button>
-          <Plus className="w-5 h-5 mr-2" />
-          Create Template
-        </Button>
-      </div>
-
-      <div className="grid grid-cols-2 gap-6">
-        {[
-          { name: 'Initial Outreach - Product Review', usage: '89%', responses: '28%' },
-          { name: 'Follow-up - No Response', usage: '67%', responses: '15%' },
-          { name: 'Negotiation - Rate Discussion', usage: '45%', responses: '72%' },
-          { name: 'Partnership Proposal - Long-term', usage: '34%', responses: '41%' },
-          { name: 'Thank You - Post Campaign', usage: '92%', responses: '85%' },
-          { name: 'Seasonal Campaign - Holiday', usage: '23%', responses: '33%' }
-        ].map((template, idx) => (
-          <Card key={idx}>
-            <CardContent className="p-6">
-              <h3 className="font-semibold mb-2">{template.name}</h3>
-              <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
-                <span>Usage: {template.usage}</span>
-                <span>Response Rate: {template.responses}</span>
-              </div>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" className="flex-1">
-                  Edit
-                </Button>
-                <Button size="sm" className="flex-1">
-                  Use Template
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </div>
-  );
-
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -649,8 +608,7 @@ Example: 'I'm launching a new fitness protein powder targeted at women aged 25-3
             {[
               { key: 'outreach', label: 'AI Outreach', icon: Bot },
               { key: 'dashboard', label: 'Campaign Dashboard', icon: BarChart3 },
-              { key: 'analytics', label: 'Analytics', icon: TrendingUp },
-              { key: 'templates', label: 'Templates', icon: Mail }
+              { key: 'analytics', label: 'Analytics', icon: TrendingUp }
             ].map(({ key, label, icon: Icon }) => (
               <button
                 key={key}
@@ -680,7 +638,6 @@ Example: 'I'm launching a new fitness protein powder targeted at women aged 25-3
           )}
           {activeTab === 'dashboard' && <CampaignDashboard />}
           {activeTab === 'analytics' && <AnalyticsTab />}
-          {activeTab === 'templates' && <TemplatesTab />}
         </div>
       </div>
 
