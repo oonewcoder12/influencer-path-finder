@@ -373,139 +373,6 @@ Example: 'I'm launching a new fitness protein powder targeted at women aged 25-3
     </div>
   );
 
-  const CampaignDashboard = () => (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold">Campaign Dashboard</h2>
-          <p className="text-muted-foreground mt-1">AI is handling conversations automatically</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <Button
-            variant={autoReplyEnabled ? "default" : "outline"}
-            onClick={() => setAutoReplyEnabled(!autoReplyEnabled)}
-          >
-            {autoReplyEnabled ? <Play className="w-4 h-4 mr-2" /> : <Pause className="w-4 h-4 mr-2" />}
-            AI Auto-Reply: {autoReplyEnabled ? 'ON' : 'OFF'}
-          </Button>
-        </div>
-      </div>
-
-      {/* Stats Overview */}
-      <div className="grid grid-cols-4 gap-6">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Mail className="w-5 h-5 text-blue-600" />
-              </div>
-              <div>
-                <div className="text-2xl font-bold">{selectedInfluencers.length}</div>
-                <div className="text-sm text-muted-foreground">Emails Sent</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <MessageSquare className="w-5 h-5 text-green-600" />
-              </div>
-              <div>
-                <div className="text-2xl font-bold">2</div>
-                <div className="text-sm text-muted-foreground">Responses</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <Bot className="w-5 h-5 text-purple-600" />
-              </div>
-              <div>
-                <div className="text-2xl font-bold">1</div>
-                <div className="text-sm text-muted-foreground">AI Negotiations</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-orange-100 rounded-lg">
-                <CheckCircle className="w-5 h-5 text-orange-600" />
-              </div>
-              <div>
-                <div className="text-2xl font-bold">1</div>
-                <div className="text-sm text-muted-foreground">Accepted</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Active Conversations */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Active Conversations</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-6">
-            {mockConversations.map((conversation) => (
-              <div key={conversation.id} className="border rounded-lg p-4">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <h4 className="font-semibold">{conversation.influencer}</h4>
-                    <Badge variant={
-                      conversation.status === 'negotiating' ? 'secondary' :
-                      conversation.status === 'accepted' ? 'default' : 'outline'
-                    }>
-                      {conversation.status}
-                    </Badge>
-                    {conversation.aiHandling && (
-                      <div className="flex items-center gap-1 text-xs text-primary">
-                        <Bot className="w-3 h-3" />
-                        AI Handling
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm">
-                      Take Over
-                    </Button>
-                    <Button size="sm">
-                      View Full Chat
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="bg-secondary rounded-lg p-3 max-h-40 overflow-y-auto">
-                  {conversation.messages.slice(-2).map((message, idx) => (
-                    <div key={idx} className={`mb-2 ${message.type === 'ai' ? 'text-primary' : 'text-foreground'}`}>
-                      <div className="flex items-center gap-2 mb-1">
-                        {message.type === 'ai' ? <Bot className="w-3 h-3" /> : <User className="w-3 h-3" />}
-                        <span className="text-xs font-medium">
-                          {message.type === 'ai' ? 'AI Assistant' : conversation.influencer}
-                        </span>
-                        <span className="text-xs text-muted-foreground">{message.timestamp}</span>
-                      </div>
-                      <p className="text-sm pl-5">{message.content}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
 
   const AnalyticsTab = () => (
     <div className="space-y-6">
@@ -607,7 +474,6 @@ Example: 'I'm launching a new fitness protein powder targeted at women aged 25-3
           <nav className="flex space-x-8">
             {[
               { key: 'outreach', label: 'AI Outreach', icon: Bot },
-              { key: 'dashboard', label: 'Campaign Dashboard', icon: BarChart3 },
               { key: 'analytics', label: 'Analytics', icon: TrendingUp }
             ].map(({ key, label, icon: Icon }) => (
               <button
@@ -633,10 +499,8 @@ Example: 'I'm launching a new fitness protein powder targeted at women aged 25-3
               {campaignStep === 'brief' && <CampaignBriefStep />}
               {campaignStep === 'results' && <CampaignResultsStep />}
               {campaignStep === 'emails' && <EmailGenerationStep />}
-              {campaignStep === 'dashboard' && <CampaignDashboard />}
             </div>
           )}
-          {activeTab === 'dashboard' && <CampaignDashboard />}
           {activeTab === 'analytics' && <AnalyticsTab />}
         </div>
       </div>
