@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Search, Users, BarChart3, Settings } from "lucide-react";
+import { Search, Users, BarChart3, Settings, Bot } from "lucide-react";
 import { useLocation, Link } from "react-router-dom";
 
 const Header = () => {
@@ -11,6 +11,7 @@ const Header = () => {
     { path: "/dashboard", label: "Dashboard", icon: BarChart3 },
     { path: "/contacts", label: "Contacts", icon: Users },
     { path: "/templates", label: "Templates", icon: null },
+    { path: "/ai-outreach", label: "AI Outreach", icon: Bot },
   ];
 
   return (

@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import Contacts from "./pages/Contacts";
 import Templates from "./pages/Templates";
 import Campaigns from "./pages/Campaigns";
+import AIOutreach from "./pages/AIOutreach";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/contacts" element={<Contacts />} />
           <Route path="/templates" element={<Templates />} />
           <Route path="/campaigns" element={<Campaigns />} />
+          <Route path="/ai-outreach" element={<AIOutreach />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
