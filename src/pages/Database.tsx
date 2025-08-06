@@ -10,6 +10,9 @@ import { Search, Filter, Heart, Users, TrendingUp, ExternalLink, Download, Star,
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
 import CampaignModal from "@/components/CampaignModal";
+import AIDiscoveryEngine from "@/components/AIDiscoveryEngine";
+import BulkOperations from "@/components/BulkOperations";
+import EnhancedMatchingSystem from "@/components/EnhancedMatchingSystem";
 
 interface Influencer {
   id: number;
@@ -48,6 +51,8 @@ const Database = () => {
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [showCampaignModal, setShowCampaignModal] = useState(false);
   const [selectedInfluencerForCampaign, setSelectedInfluencerForCampaign] = useState<number | null>(null);
+  const [activeView, setActiveView] = useState("database"); // database, ai-discovery, bulk-ops
+  const [selectedForBulk, setSelectedForBulk] = useState<number[]>([]);
   const { toast } = useToast();
 
   // Enhanced influencer database with jewelry/fashion focus
@@ -286,6 +291,11 @@ const Database = () => {
     });
   };
 
+  const handleBulkAction = (action: string, data: any) => {
+    // Handle bulk operations
+    console.log("Bulk action:", action, data);
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "confirmed": return "default";
@@ -311,8 +321,34 @@ const Database = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Search Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Influencer Database</h1>
-          <p className="text-muted-foreground">Discover and connect with verified creators across all platforms</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold mb-2">Influencer Database</h1>
+              <p className="text-muted-foreground">Discover and connect with verified creators across all platforms</p>
+            </div>
+            
+            {/* View Toggle */}
+            <div className="flex gap-2">
+              <Button 
+                variant={activeView === "database" ? "default" : "ghost"}
+                onClick={() => setActiveView("database")}
+              >
+                Database
+              </Button>
+              <Button 
+                variant={activeView === "ai-discovery" ? "default" : "ghost"}
+                onClick={() => setActiveView("ai-discovery")}
+              >
+                AI Discovery
+              </Button>
+              <Button 
+                variant={activeView === "bulk-ops" ? "default" : "ghost"}
+                onClick={() => setActiveView("bulk-ops")}
+              >
+                Bulk Operations
+              </Button>
+            </div>
+          </div>
         </div>
 
         {/* Search and Filters */}
@@ -443,16 +479,45 @@ const Database = () => {
           </div>
         </div>
 
-        {/* Results */}
-        <div className="grid lg:grid-cols-2 gap-6">
+        {/* Conditional Content Based on Active View */}
+        {activeView === "ai-discovery" && (
+          <AIDiscoveryEngine />
+        )}
+
+        {activeView === "bulk-ops" && (
+          <BulkOperations 
+            selectedInfluencers={selectedForBulk}
+            allInfluencers={filteredInfluencers}
+            onSelectionChange={setSelectedForBulk}
+            onBulkAction={handleBulkAction}
+          />
+        )}
+
+        {/* Results - Only show in database view */}
+        {activeView === "database" && (
+          <>
+            <div className="grid lg:grid-cols-2 gap-6">
           {filteredInfluencers.map((influencer) => (
             <Card key={influencer.id} className="p-6 hover:shadow-elegant transition-smooth">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center space-x-4">
-                  <Avatar className="w-16 h-16">
-                    <AvatarImage src={influencer.avatar} alt={influencer.name} />
-                    <AvatarFallback>{influencer.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                  </Avatar>
+                  <div className="relative">
+                    <Avatar className="w-16 h-16">
+                      <AvatarImage src={influencer.avatar} alt={influencer.name} />
+                      <AvatarFallback>{influencer.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                    </Avatar>
+                    <Checkbox 
+                      className="absolute -top-2 -right-2"
+                      checked={selectedForBulk.includes(influencer.id)}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setSelectedForBulk([...selectedForBulk, influencer.id]);
+                        } else {
+                          setSelectedForBulk(selectedForBulk.filter(id => id !== influencer.id));
+                        }
+                      }}
+                    />
+                  </div>
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <h3 className="font-semibold">{influencer.name}</h3>
@@ -545,13 +610,16 @@ const Database = () => {
           ))}
         </div>
 
-        {/* Load More */}
-        <div className="text-center mt-8">
-          <Button variant="outline">Load More Results</Button>
-        </div>
+            {/* Load More */}
+            <div className="text-center mt-8">
+              <Button variant="outline">Load More Results</Button>
+            </div>
+            </div>
+          </>
+        )}
       </div>
       
-      <CampaignModal 
+      <CampaignModal
         isOpen={showCampaignModal}
         onClose={() => {
           setShowCampaignModal(false);

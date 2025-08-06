@@ -4,6 +4,7 @@ import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import AutomatedOutreach from '@/components/AutomatedOutreach';
 
 const AIOutreach = () => {
   const [activeTab, setActiveTab] = useState('outreach');
@@ -474,6 +475,7 @@ Example: 'I'm launching a new fitness protein powder targeted at women aged 25-3
           <nav className="flex space-x-8">
             {[
               { key: 'outreach', label: 'AI Outreach', icon: Bot },
+              { key: 'automation', label: 'Automation', icon: Settings },
               { key: 'analytics', label: 'Analytics', icon: TrendingUp }
             ].map(({ key, label, icon: Icon }) => (
               <button
@@ -499,9 +501,11 @@ Example: 'I'm launching a new fitness protein powder targeted at women aged 25-3
               {campaignStep === 'brief' && <CampaignBriefStep />}
               {campaignStep === 'results' && <CampaignResultsStep />}
               {campaignStep === 'emails' && <EmailGenerationStep />}
+              {campaignStep === 'automation' && <AutomatedOutreach />}
             </div>
           )}
           {activeTab === 'analytics' && <AnalyticsTab />}
+          {activeTab === 'automation' && <AutomatedOutreach />}
         </div>
       </div>
 
