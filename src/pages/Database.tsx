@@ -315,8 +315,9 @@ const Database = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-subtle">
-      <Header />
+    <>
+      <div className="min-h-screen bg-gradient-subtle">
+        <Header />
       
       <div className="container mx-auto px-4 py-8">
         {/* Search Header */}
@@ -614,7 +615,6 @@ const Database = () => {
             <div className="text-center mt-8">
               <Button variant="outline">Load More Results</Button>
             </div>
-            </div>
           </>
         )}
       </div>
@@ -627,7 +627,8 @@ const Database = () => {
         }}
         selectedInfluencers={selectedInfluencerForCampaign ? [selectedInfluencerForCampaign] : []}
       />
-    </div>
+      </div>
+    </>
   );
 };
 
